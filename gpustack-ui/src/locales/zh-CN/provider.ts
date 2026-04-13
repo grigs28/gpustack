@@ -44,5 +44,8 @@ export default {
   'providers.form.authStyle': '认证方式',
   'providers.form.authStyleAnthropic': 'Anthropic 认证方式',
   'providers.form.stripFields': '过滤非核心字段',
-  'providers.form.stripFieldsDesc': '开启后将过滤 thinking、metadata 等非核心字段，避免上游报错（推荐对 Kimi 等非标准供应商开启）'
+  'providers.form.stripFieldsDesc': '开启后将过滤 thinking、metadata 等非核心字段，避免上游报错（推荐对 Kimi 等非标准供应商开启）',
+  'routes.formatBadge.openai': 'OpenAI 兼容',
+  'routes.formatBadge.anthropic': 'Anthropic 兼容',
+  'routes.formatBadge.both': '双格式',
 };

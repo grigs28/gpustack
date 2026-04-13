@@ -46,5 +46,8 @@ export default {
   'providers.form.authStyle': 'Auth Style',
   'providers.form.authStyleAnthropic': 'Anthropic Auth Style',
   'providers.form.stripFields': 'Strip Non-core Fields',
-  'providers.form.stripFieldsDesc': 'Strip thinking, metadata and other non-core fields to avoid upstream errors. Recommended for non-standard providers like Kimi.'
+  'providers.form.stripFieldsDesc': 'Strip thinking, metadata and other non-core fields to avoid upstream errors. Recommended for non-standard providers like Kimi.',
+  'routes.formatBadge.openai': 'OpenAI Compatible',
+  'routes.formatBadge.anthropic': 'Anthropic Compatible',
+  'routes.formatBadge.both': 'Dual Format',
 };

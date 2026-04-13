@@ -32,6 +32,7 @@ export interface RouteItem {
   targets: number;
   ready_targets: number;
   access_policy: string;
+  supported_formats?: string[];
 }
 
 export interface RouteTarget {
@@ -47,4 +48,5 @@ export interface RouteTarget {
   provider_model_name: string;
   fallback_status_codes: string[];
   state: string;
+  supported_formats?: string[];
 }
