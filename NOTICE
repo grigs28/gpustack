@@ -1,0 +1,18 @@
+This project is based on GPUStack (https://github.com/gpustack/gpustack)
+Copyright (c) 2024 The GPUStack authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+This project contains modifications to the original GPUStack software,
+including but not limited to:
+
+- Custom model provider with dual-format (OpenAI/Anthropic) support
+- Format conversion between Anthropic Messages API and OpenAI Chat Completions API
+- Dual base URL and dual auth style configuration for custom providers
+- Enhanced model list fetching with versioned API path handling
+- Robust upstream response parsing for various provider formats
+- Strip non-core fields option for non-standard providers
