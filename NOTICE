@@ -1,5 +1,9 @@
-This project is based on GPUStack (https://github.com/gpustack/gpustack)
+GPUStack - Custom Provider Enhancement
 Copyright (c) 2024 The GPUStack authors
+Copyright (c) 2025 grigs28
+
+This product includes software developed at
+GPUStack (https://github.com/gpustack/gpustack).
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -7,12 +11,55 @@ You may obtain a copy of the License at
 
        http://www.apache.org/licenses/LICENSE-2.0
 
-This project contains modifications to the original GPUStack software,
-including but not limited to:
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
-- Custom model provider with dual-format (OpenAI/Anthropic) support
-- Format conversion between Anthropic Messages API and OpenAI Chat Completions API
-- Dual base URL and dual auth style configuration for custom providers
-- Enhanced model list fetching with versioned API path handling
-- Robust upstream response parsing for various provider formats
-- Strip non-core fields option for non-standard providers
+================================================================================
+MODIFICATIONS
+================================================================================
+
+The following files have been modified from the original GPUStack project:
+
+Modified files:
+  - gpustack/schemas/model_provider.py
+      Added: customBaseUrlAnthropic, auth_style_anthropic, strip_fields fields
+             to CustomProviderConfig; dual base URL support via get_base_url(fmt)
+
+  - gpustack/routes/model_provider.py
+      Added: build_openai_url() for versioned API path handling
+             Custom auth_style support via AuthAdapter
+             _parse_model_list() for robust multi-format response parsing
+
+  - gpustack/routes/openai.py
+      Modified: integrated FormatRouter for provider proxy with format conversion
+
+  - gpustack/gateway/ai_proxy_types.py
+      Added: customBaseUrlAnthropic, authStyleAnthropic, supportedFormats,
+             authStyle, stripFields fields to CustomConfig
+
+New files:
+  - gpustack/converter/ (new module)
+      converters.py  — Anthropic <-> OpenAI request/response conversion
+      streaming.py   — SSE streaming format conversion
+      router.py      — Format routing (passthrough vs convert)
+      auth.py        — Auth adapter (Bearer / X-API-Key / Auto)
+      urls.py        — URL building with versioned path handling
+      provider_proxy.py — Unified provider proxy with retry and format conversion
+
+  - tests/test_converter.py
+      Unit tests for the converter module (55 tests)
+
+  - gpustack-ui/src/pages/maas-provider/hooks/use-provider-required-fields.tsx
+      Added: supported_formats, customBaseUrlAnthropic, auth_style_anthropic,
+             strip_fields field definitions for Custom provider
+
+  - gpustack-ui/src/pages/maas-provider/forms/provider-configs.tsx
+      Added: Checkbox rendering, conditional visibility via dependsOn,
+             Form.useWatch for reactive form updates
+
+  - gpustack-ui/src/locales/zh-CN/provider.ts
+  - gpustack-ui/src/locales/en-US/provider.ts
+      Added: i18n labels for new configuration fields
