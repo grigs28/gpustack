@@ -46,6 +46,7 @@ import useViewApIInfo from './hooks/use-view-api-info';
 const ModelRoutes: React.FC = () => {
   const {
     dataSource,
+    setDataSource,
     rowSelection,
     queryParams,
     modalRef,
@@ -259,6 +260,46 @@ const ModelRoutes: React.FC = () => {
   const setDisableExpand = (record: any) => {
     return !record?.targets;
   };
+
+  // Aggregate supported_formats from route targets into each route
+  useEffect(() => {
+    if (!dataSource.loadend || !dataSource.dataList?.length) return;
+
+    const fetchFormats = async () => {
+      try {
+        const res = await queryRouteTargets({} as any);
+        const allTargets = res.items || [];
+
+        // Group targets by route_id and collect unique supported_formats
+        const routeFormatsMap: Record<number, string[]> = {};
+        for (const target of allTargets) {
+          if (target.route_id != null && target.supported_formats?.length) {
+            if (!routeFormatsMap[target.route_id]) {
+              routeFormatsMap[target.route_id] = [];
+            }
+            for (const fmt of target.supported_formats) {
+              if (!routeFormatsMap[target.route_id].includes(fmt)) {
+                routeFormatsMap[target.route_id].push(fmt);
+              }
+            }
+          }
+        }
+
+        // Merge aggregated formats into route data
+        setDataSource((prev) => {
+          const updatedList = prev.dataList.map((route) => ({
+            ...route,
+            supported_formats: routeFormatsMap[route.id] || route.supported_formats
+          }));
+          return { ...prev, dataList: updatedList };
+        });
+      } catch (error) {
+        // ignore - formats will simply not be shown
+      }
+    };
+
+    fetchFormats();
+  }, [dataSource.loadend, dataSource.total]);
 
   useEffect(() => {
     fetchSourceModels();

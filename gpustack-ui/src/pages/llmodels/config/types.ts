@@ -27,6 +27,7 @@ export interface ListItem {
   updated_at: string;
   access_policy: 'public' | 'authed' | 'allowed_users';
   generic_proxy?: boolean;
+  supported_formats?: string[];
   gpu_selector?: {
     gpu_ids: string[];
     gpus_per_replica?: number;

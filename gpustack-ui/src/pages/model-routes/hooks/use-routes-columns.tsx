@@ -7,6 +7,7 @@ import ModelTag from '@/pages/_components/model-tag';
 import { useIntl } from '@umijs/max';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
+import FormatBadge from '../components/format-badge';
 import { rowActionList } from '../config';
 import { RouteItem } from '../config/types';
 
@@ -38,6 +39,11 @@ const useAccessColumns = (
               <span className="m-r-5 text-primary">{text}</span>
             </AutoTooltip>
             <ModelTag categoryKey={record.categories?.[0]}></ModelTag>
+            {record.supported_formats && (
+              <span style={{ marginLeft: 4 }}>
+                <FormatBadge supported_formats={record.supported_formats} />
+              </span>
+            )}
           </span>
         )
       },

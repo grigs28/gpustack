@@ -16,7 +16,7 @@ import { BulbOutlined } from '@ant-design/icons';
 import { useIntl, useNavigate } from '@umijs/max';
 import { Button, Tag } from 'antd';
 import _ from 'lodash';
-import { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { modelCategoriesMap } from '../config';
 import { ListItem } from '../config/types';
@@ -98,11 +98,36 @@ const ApiAccessInfo = ({ open, data, onClose }: ApiAccessInfoProps) => {
   const navigate = useNavigate();
   const { GenericProxyCommandCode, openProxyModal } = useGenericProxy();
 
-  const endPoint = useMemo(() => {
-    if (!data.generic_proxy) {
-      return `${window.location.origin}/${OPENAI_COMPATIBLE}`;
+  const endpoints = useMemo(() => {
+    if (data.generic_proxy) {
+      return [
+        {
+          url: `${window.location.origin}${MODEL_PROXY}/<YOUR_API_PATH>`,
+          label: 'Generic Proxy'
+        }
+      ];
     }
-    return `${window.location.origin}${MODEL_PROXY}/<YOUR_API_PATH>`;
+
+    const formats = data.supported_formats || ['openai'];
+    const result = [];
+
+    if (formats.includes('openai')) {
+      result.push({
+        url: `${window.location.origin}/${OPENAI_COMPATIBLE}`,
+        label: intl.formatMessage({ id: 'models.table.apiAccessInfo.openaiCompatible' })
+      });
+    }
+    if (formats.includes('anthropic')) {
+      result.push({
+        url: `${window.location.origin}/v1/messages`,
+        label: 'Anthropic Compatible'
+      });
+    }
+
+    return result.length > 0 ? result : [{
+      url: `${window.location.origin}/${OPENAI_COMPATIBLE}`,
+      label: intl.formatMessage({ id: 'models.table.apiAccessInfo.openaiCompatible' })
+    }];
   }, [data]);
 
   const isRanker = useMemo(() => {
@@ -156,28 +181,23 @@ const ApiAccessInfo = ({ open, data, onClose }: ApiAccessInfoProps) => {
       </Tips>
 
       <ApiAccessInfoWrapper>
-        <span className="label">
-          {intl.formatMessage({ id: 'models.table.apiAccessInfo.endpoint' })}
-        </span>
-        <span className="value">
-          <AutoTooltip ghost maxWidth={data.generic_proxy ? 400 : 240}>
-            {endPoint}
-          </AutoTooltip>
-          {!data.generic_proxy && (
-            <APITAG color="geekblue">
-              {isRanker
-                ? intl.formatMessage({
-                    id: 'models.table.apiAccessInfo.jinaCompatible'
-                  })
-                : intl.formatMessage({
-                    id: 'models.table.apiAccessInfo.openaiCompatible'
-                  })}
-            </APITAG>
-          )}
-        </span>
-        <span className="copy-btn">
-          <CopyButton text={endPoint} type="link" size="small"></CopyButton>
-        </span>
+        {endpoints.map((ep, idx) => (
+          <React.Fragment key={idx}>
+            <span className="label">
+              {intl.formatMessage({ id: 'models.table.apiAccessInfo.endpoint' })}
+              {endpoints.length > 1 && ` ${idx + 1}`}
+            </span>
+            <span className="value">
+              <AutoTooltip ghost maxWidth={240}>
+                {ep.url}
+              </AutoTooltip>
+              <APITAG color="geekblue">{ep.label}</APITAG>
+            </span>
+            <span className="copy-btn">
+              <CopyButton text={ep.url} type="link" size="small"></CopyButton>
+            </span>
+          </React.Fragment>
+        ))}
         <span className="label">
           {intl.formatMessage({
             id: 'models.table.apiAccessInfo.modelName'

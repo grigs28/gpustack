@@ -11,6 +11,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { TargetStatus, TargetStatusLabelMap } from '../config';
 import { RouteTarget } from '../config/types';
+import FormatBadge from './format-badge';
 
 const CellContent = styled.div`
   display: flex;
@@ -69,6 +70,9 @@ const RouteItem: React.FC<TargetItemProps> = ({
             ? modelList?.find((m) => m.value === data.model_id)?.label
             : data.provider_model_name}
         </AutoTooltip>
+        {data.supported_formats && (
+          <FormatBadge supported_formats={data.supported_formats} />
+        )}
       </span>
     );
   };
