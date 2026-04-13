@@ -1,0 +1,115 @@
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ config.namespace }}
+---
+# Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: registration-token
+  namespace: {{ config.namespace }}
+type: Opaque
+data:
+  {%- for k, v in config.env.items() %}
+  {{ k }}: {{ v | b64encode }}
+  {%- endfor %}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ingressclass-viewer
+rules:
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingressclasses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ingressclass-viewer-binding
+subjects:
+  - kind: ServiceAccount
+    name: gpustack-worker
+    namespace: {{ config.namespace }}
+roleRef:
+  kind: ClusterRole
+  name: ingressclass-viewer
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pod-cm-creator
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+      - "configmaps"
+      - "secrets"
+      - "services"
+      - "pods/log"
+      - "pods/exec"
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources: 
+      - "events"
+    verbs: 
+      - "create"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: {{ config.namespace }}
+  name: gpustack-worker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: {{ config.namespace }}
+  name: pod-cm-creator
+subjects:
+- kind: ServiceAccount
+  name: gpustack-worker
+  namespace: {{ config.namespace }}
+roleRef:
+  kind: ClusterRole
+  name: pod-cm-creator
+  apiGroup: rbac.authorization.k8s.io
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker
+  namespace: {{ config.namespace }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "10151"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  selector:
+    app: gpustack-worker
+  ports:
+    - name: api
+      port: 10150
+      targetPort: 10150
+    - name: metrics
+      port: 10151
+      targetPort: 10151

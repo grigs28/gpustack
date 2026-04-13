@@ -1,0 +1,31 @@
+:local(.card-body) {
+  box-shadow: none !important;
+
+  :global(.ant-card-body) {
+    height: 96px;
+    display: flex;
+    justify-content: space-around;
+    border-radius: var(--ant-border-radius-lg);
+    border: 1px solid var(--ant-color-border);
+    padding: 16px 24px;
+  }
+}
+
+:local(.row) {
+  :global(.ant-col-5) {
+    flex: 0 0 20%;
+    max-width: 20%;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+
+  .label {
+    font-weight: var(--font-weight-medium);
+  }
+}

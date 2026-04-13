@@ -1,0 +1,14 @@
+{
+  "*.{md,json}": ["prettier --cache --write"],
+  "*.{js,jsx}": ["max lint --fix --eslint-only", "prettier --cache --write"],
+  "*.{css,less}": [
+    "max lint --fix --stylelint-only",
+    "prettier --cache --write"
+  ],
+  "!public/vs/**": [],
+  "*.ts?(x)": [
+    "max lint --fix --eslint-only",
+    "prettier --cache --parser=typescript --write"
+  ],
+  "src/locales/**/*.ts": ["npx tsx src/locales/check.ts"]
+}

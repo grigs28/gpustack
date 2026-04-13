@@ -1,0 +1,76 @@
+export default {
+  'noresult.button.add': 'Добавить сейчас',
+  'noresult.mymodels.title': 'Нет доступных моделей',
+  'noresult.mymodels.subTitle':
+    'Обратитесь к администратору для получения доступа.',
+  'noresult.mymodels.nofound': 'Подходящие модели не найдены',
+  'noresult.deployments.title': 'Нет развернутых моделей',
+  'noresult.deployments.subTitle':
+    'Вы еще не развернули ни одной модели. Нажмите кнопку ниже, чтобы начать.',
+  'noresult.gpus.title': 'GPU устройства не обнаружены',
+  'noresult.gpus.subTitle': 'Проверьте, что статус Worker READY.',
+  'noresult.gpus.nofound': 'Подходящие GPU устройства не найдены.',
+  'noresult.workers.title': 'Нет воркеров',
+  'noresult.workers.subTitle': 'Воркеры не найдены ни в одном кластере.',
+  'noresult.workers.nofound': 'Подходящие воркеры не найдены.',
+  'noresult.workers.button.add': 'Перейти к добавлению воркера',
+  'noresult.modelfiles.title': 'Нет файлов моделей',
+  'noresult.modelfiles.subTitle': 'Файлы моделей еще не добавлены.',
+  'noresult.modelfiles.nofound': 'Подходящие файлы моделей не найдены.',
+  'noresult.backend.title': 'Нет бэкендов вывода',
+  'noresult.backend.subTitle': 'Бэкенды вывода еще не добавлены.',
+  'noresult.backend.nofound': 'Подходящие бэкенды вывода не найдены.',
+  'noresult.cluster.title': 'Нет кластеров',
+  'noresult.cluster.subTitle': 'Кластеры еще не добавлены.',
+  'noresult.cluster.nofound': 'Подходящие кластеры не найдены.',
+  'noresult.credentials.title': 'Нет учетных данных',
+  'noresult.credentials.subTitle': 'Учетные данные еще не добавлены.',
+  'noresult.credentials.nofound': 'Подходящие учетные данные не найдены.',
+  'noresult.users.title': 'Нет пользователей',
+  'noresult.users.subTitle': 'Пользователи еще не добавлены.',
+  'noresult.users.nofound': 'Подходящие пользователи не найдены.',
+  'noresult.keys.title': 'Нет API-ключей',
+  'noresult.keys.subTitle': 'API-ключи еще не добавлены.',
+  'noresult.keys.nofound': 'Подходящие API-ключи не найдены.',
+  'noresult.catalog.title': 'Нет моделей',
+  'noresult.catalog.subTitle': 'Модели еще не настроены.',
+  'noresult.catalog.nofound': 'Подходящие модели не найдены.',
+  'noresult.resources.cluster':
+    'No clusters available. Add a cluster to get started.',
+  'noresult.resources.worker':
+    'No workers available. Add a worker to get started.',
+  'noresult.resources.gotocluster': 'Create Your First Cluster',
+  'noresult.resources.gotoworker': 'Add Worker',
+  'noresult.benchmark.title': 'No Benchmarks',
+  'noresult.benchmark.subTitle': 'No benchmarks have been added yet.',
+  'noresult.benchmark.nofound': 'No matching benchmarks found.',
+  'noresult.providers.title': 'No Providers',
+  'noresult.providers.subTitle': 'No providers have been added yet.',
+  'noresult.providers.nofound': 'No matching providers found.',
+  'noresult.routes.title': 'No Routes',
+  'noresult.routes.subTitle': 'No routes have been added yet.',
+  'noresult.routes.nofound': 'No matching routes found.',
+  'noresult.instances.title': 'No instances',
+  'noresult.instances.subTitle':
+    'There are no running model instances. Deploy a model to create one automatically.',
+  'noresult.instances.nofound': 'No matching instances found.'
+};
+
+// ========== To-Do: Translate Keys (Remove After Translation) ==========
+// 1. 'noresult.resources.cluster': 'No clusters available. Add a cluster to get started.',
+// 2. 'noresult.resources.worker': 'No workers available. Add a worker to get started.',
+// 3. 'noresult.resources.gotocluster': 'Create Your First Cluster',
+// 4. 'noresult.resources.gotoworker': 'Add Worker',
+// 5. 'noresult.benchmark.title': 'No Benchmarks',
+// 6. 'noresult.benchmark.subTitle': 'No benchmarks have been added yet.',
+// 7. 'noresult.benchmark.nofound': 'No matching benchmarks found.'
+// 5. 'noresult.providers.title': 'No Providers',
+// 6. 'noresult.providers.subTitle': 'No providers have been added yet.',
+// 7. 'noresult.providers.nofound': 'No matching providers found.',
+// 8. 'noresult.routes.title': 'No Routes',
+// 9. 'noresult.routes.subTitle': 'No routes have been added yet.',
+// 10. 'noresult.routes.nofound': 'No matching routes found.'
+// 11. 'noresult.instances.title': 'No instances',
+// 12. 'noresult.instances.subTitle': 'There are no running model instances. Deploy a model to create one automatically.',
+// 13. 'noresult.instances.nofound': 'No matching instances found.'
+// ========================================================================

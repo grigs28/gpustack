@@ -1,0 +1,480 @@
+import { systemConfigAtom } from '@/atoms/system';
+import { GPUStackVersionAtom } from '@/atoms/user';
+import AutoTooltip from '@/components/auto-tooltip';
+import DropdownButtons from '@/components/drop-down-buttons';
+import IconFont from '@/components/icon-font';
+import LabelsCell from '@/components/label-cell';
+import ProgressBar from '@/components/progress-bar';
+import InfoColumn from '@/components/simple-table/info-column';
+import StatusTag from '@/components/status-tag';
+import { tableSorter } from '@/config/settings';
+import GrafanaIcon from '@/pages/_components/grafana-icon';
+import { convertFileSize } from '@/utils';
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  EditOutlined,
+  InfoCircleOutlined,
+  SafetyOutlined,
+  ToolOutlined
+} from '@ant-design/icons';
+import { useIntl } from '@umijs/max';
+import { Tag, Tooltip } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
+import { useAtom, useAtomValue } from 'jotai';
+import _ from 'lodash';
+import { useMemo } from 'react';
+import semverCoerce from 'semver/functions/coerce';
+import semverGt from 'semver/functions/gt';
+import { status, WorkerStatusMap, WorkerStatusMapValue } from '../config';
+import { Filesystem, GPUDeviceItem, ListItem } from '../config/types';
+import workerCss from '../styles/worker.less';
+
+const ActionList = [
+  { label: 'common.button.edit', key: 'edit', icon: <EditOutlined /> },
+  {
+    label: 'resources.metrics.details',
+    key: 'metrics',
+    icon: (
+      <span className="flex-center">
+        <GrafanaIcon style={{ width: 14, height: 14 }}></GrafanaIcon>
+      </span>
+    )
+  },
+  // {
+  //   label: 'common.button.detail',
+  //   key: 'details',
+  //   icon: <FileTextOutlined></FileTextOutlined>
+  // },
+  {
+    label: 'resources.worker.download.privatekey',
+    key: 'download_ssh_key',
+    icon: <DownloadOutlined />
+  },
+  {
+    label: 'resources.worker.maintenance.enable',
+    key: 'star_maintenance',
+    icon: <ToolOutlined />
+  },
+  {
+    label: 'resources.worker.maintenance.disable',
+    key: 'stop_maintenance',
+    icon: <SafetyOutlined />
+  },
+  // {
+  //   label: 'common.button.logs',
+  //   locale: false,
+  //   key: 'logs',
+  //   icon: <IconFont type="icon-logs" />
+  // },
+  // { label: 'common.button.terminal', key: 'terminal', icon: <CodeOutlined /> },
+  {
+    label: 'common.button.delete',
+    key: 'delete',
+    props: { danger: true },
+    icon: <DeleteOutlined />
+  }
+];
+
+const fieldList = [
+  {
+    label: 'resources.table.total',
+    key: 'total',
+    locale: true,
+    render: (val: any) => convertFileSize(val, 0)
+  },
+  {
+    label: 'resources.table.used',
+    key: 'used',
+    locale: true,
+    render: (val: any) => convertFileSize(val, 0)
+  },
+  {
+    label: 'resources.table.allocated',
+    key: 'allocated',
+    locale: true,
+    render: (val: any) => convertFileSize(val, 0)
+  }
+];
+
+const showUpgrade = (
+  workerVersion: string,
+  currentVersion: string
+): boolean => {
+  const w_ver = semverCoerce(workerVersion);
+  const c_ver = semverCoerce(currentVersion);
+
+  return !!w_ver && !!c_ver && semverGt(c_ver, w_ver);
+};
+
+const formateUtilization = (val1: number, val2: number): number =>
+  val1 && val2 ? _.round((val1 / val2) * 100, 0) : 0;
+
+const calcStorage = (files: Filesystem[]) => {
+  const mountRoot = _.find(
+    files,
+    (item: Filesystem) => item.mount_point === '/'
+  );
+  return mountRoot ? formateUtilization(mountRoot.used, mountRoot.total) : 0;
+};
+
+const GPUCell = ({ devices }: { devices: GPUDeviceItem[] }) => (
+  <span className="flex-column flex-gap-2">
+    {_.map(
+      _.sortBy(devices || [], ['index']),
+      (item: GPUDeviceItem, index: number) => (
+        <span className="flex-center" key={index}>
+          <span
+            className="m-r-5"
+            style={{ display: 'flex', width: 25, lineHeight: 1 }}
+          >
+            [{item.index}]
+          </span>
+          {item.core ? (
+            <ProgressBar percent={_.round(item.core?.utilization_rate, 0)} />
+          ) : (
+            '-'
+          )}
+        </span>
+      )
+    )}
+  </span>
+);
+
+const VRAMCell = ({
+  devices,
+  intl,
+  rIndex,
+  loadend,
+  firstLoad
+}: {
+  devices: GPUDeviceItem[];
+  intl: any;
+  rIndex: number;
+  loadend: boolean;
+  firstLoad: boolean;
+}) => (
+  <span className="flex-column flex-gap-2">
+    {_.map(
+      _.sortBy(devices || [], ['index']),
+      (item: GPUDeviceItem, index: number) => (
+        <span key={index} className="flex-center">
+          <span
+            className="m-r-5"
+            style={{ display: 'flex', width: 25, lineHeight: 1 }}
+          >
+            [{item.index}]
+          </span>
+          <ProgressBar
+            defaultOpen={rIndex === 0 && index === 0 && loadend && firstLoad}
+            percent={
+              item.memory?.used
+                ? _.round(item.memory?.utilization_rate, 0)
+                : _.round(
+                    (item.memory?.allocated / item.memory?.total) * 100,
+                    0
+                  )
+            }
+            label={<InfoColumn fieldList={fieldList} data={item.memory} />}
+          />
+          {item.memory.is_unified_memory && (
+            <Tooltip
+              title={intl.formatMessage({ id: 'resources.table.unified' })}
+            >
+              <InfoCircleOutlined
+                className="m-l-5"
+                style={{ color: 'var(--ant-blue-5)' }}
+              />
+            </Tooltip>
+          )}
+        </span>
+      )
+    )}
+  </span>
+);
+
+const StorageCell = ({ files }: { files: Filesystem[] }) => {
+  const mountRoot = _.find(
+    files,
+    (item: Filesystem) => item.mount_point === '/'
+  );
+  return (
+    <ProgressBar
+      percent={calcStorage(files)}
+      label={
+        mountRoot ? (
+          <InfoColumn
+            fieldList={fieldList.filter((f) => f.key !== 'allocated')}
+            data={mountRoot}
+          />
+        ) : (
+          0
+        )
+      }
+    />
+  );
+};
+
+const statusAvailable = (record: ListItem) => {
+  return (
+    WorkerStatusMap.initializing !== record.state &&
+    WorkerStatusMap.provisioning !== record.state &&
+    record.status
+  );
+};
+
+const HolderStatus = () => {
+  return <span>N/A</span>;
+};
+
+const useWorkerColumns = ({
+  clusterData,
+  loadend,
+  firstLoad,
+  sortOrder,
+  handleSelect
+}: {
+  clusterData: {
+    list: Global.BaseOption<number>[];
+    data: Record<number, string>;
+  };
+  loadend: boolean;
+  firstLoad: boolean;
+  sortOrder: string[];
+  handleSelect: (action: string, record: ListItem) => void;
+}): ColumnsType<ListItem> => {
+  const intl = useIntl();
+  const systemConfig = useAtomValue(systemConfigAtom);
+  const [version] = useAtom(GPUStackVersionAtom);
+
+  console.log('version in useWorkerColumns', version);
+
+  const renderIP = (text: string, record: ListItem) => {
+    if (record.advertise_address === record.ip) {
+      return <span className="text-primary">{record.ip}</span>;
+    }
+
+    if (
+      record.advertise_address !== record.ip &&
+      record.advertise_address &&
+      record.ip
+    ) {
+      return (
+        <span className={workerCss.ipWrapper}>
+          <span className="item">
+            <span className="text-primary">{record.ip}</span>
+            <span className="label">{`(${intl.formatMessage({ id: 'clusters.table.ip.internal' })})`}</span>
+            <span className="text-primary">{record.advertise_address}</span>
+            <span className="label">{`(${intl.formatMessage({ id: 'clusters.table.ip.external' })})`}</span>
+          </span>
+        </span>
+      );
+    }
+    return (
+      <span className="text-primary">
+        {record.ip || record.advertise_address || ''}
+      </span>
+    );
+  };
+
+  const setActions = (row: ListItem) => {
+    return ActionList.filter((action) => {
+      if (action.key === 'download_ssh_key') {
+        return !!row.ssh_key_id;
+      }
+      if (action.key === 'star_maintenance') {
+        return !row.maintenance?.enabled;
+      }
+      if (action.key === 'stop_maintenance') {
+        return row.maintenance?.enabled;
+      }
+
+      if (action.key === 'metrics') {
+        return systemConfig.showMonitoring;
+      }
+      return true;
+    });
+  };
+
+  return useMemo<ColumnsType<ListItem>>(
+    () => [
+      {
+        title: intl.formatMessage({ id: 'common.table.name' }),
+        dataIndex: 'name',
+        width: 140,
+        sorter: tableSorter(1),
+        render: (text: string, record: ListItem) => (
+          <div className={workerCss.name}>
+            <AutoTooltip ghost maxWidth={200}>
+              <span className="name-text">{text}</span>
+            </AutoTooltip>
+            <div className={workerCss['worker-version']}>
+              <AutoTooltip
+                ghost
+                showTitle={showUpgrade(record.worker_version, version.version)}
+                title={intl.formatMessage({
+                  id: 'resoureces.worker.upgrade.tips'
+                })}
+              >
+                <Tag className="version-tag" variant="outlined">
+                  {version.version}
+                  {showUpgrade(record.worker_version, version.version) && (
+                    <IconFont type="icon-upgrade"></IconFont>
+                  )}
+                </Tag>
+              </AutoTooltip>
+              <Tooltip
+                title={
+                  <span>
+                    {intl.formatMessage({
+                      id: 'benchmark.env.driverVersion'
+                    })}
+                    : {_.get(record, 'status.gpu_devices[0].driver_version')}
+                  </span>
+                }
+              >
+                <Tag className="version-tag" variant="outlined">
+                  {_.get(record, 'status.gpu_devices[0].driver_version', '')}
+                </Tag>
+              </Tooltip>
+            </div>
+          </div>
+        )
+      },
+      {
+        title: intl.formatMessage({ id: 'resources.table.labels' }),
+        dataIndex: 'labels',
+        width: 200,
+        render: (_, record) => <LabelsCell labels={record.labels} />
+      },
+      {
+        title: intl.formatMessage({ id: 'clusters.title' }),
+        dataIndex: 'cluster_id',
+        render: (id: number) => (
+          <AutoTooltip ghost maxWidth={240}>
+            {_.get(clusterData.data, id, '')}
+          </AutoTooltip>
+        )
+      },
+      {
+        title: intl.formatMessage({ id: 'common.table.status' }),
+        dataIndex: 'state',
+        sorter: tableSorter(2),
+        render: (_, record) => (
+          <StatusTag
+            maxTooltipWidth={400}
+            suffix={record.provision_progress}
+            statusValue={{
+              status: status[record.state] as any,
+              text: WorkerStatusMapValue[record.state],
+              message: record.state_message
+            }}
+          />
+        )
+      },
+      {
+        title: 'IP',
+        dataIndex: 'ip',
+        sorter: tableSorter(3),
+        render: (text: string, record) => (
+          <AutoTooltip ghost maxWidth={240}>
+            {renderIP(text, record)}
+          </AutoTooltip>
+        )
+      },
+      {
+        title: 'CPU',
+        dataIndex: 'status.cpu.utilization_rate',
+        sorter: tableSorter(4),
+        render: (text: string, record) => (
+          <span className="flex-center flex-full">
+            {statusAvailable(record) ? (
+              <ProgressBar
+                percent={_.round(record?.status?.cpu?.utilization_rate, 0)}
+              />
+            ) : (
+              <HolderStatus />
+            )}
+          </span>
+        )
+      },
+      {
+        title: intl.formatMessage({ id: 'resources.table.memory' }),
+        dataIndex: 'status.memory.utilization_rate',
+        sorter: tableSorter(5),
+        render: (_, record) => (
+          <span className="flex-center flex-full">
+            {statusAvailable(record) ? (
+              <ProgressBar
+                percent={formateUtilization(
+                  record?.status?.memory?.used,
+                  record?.status?.memory?.total
+                )}
+                label={
+                  <InfoColumn
+                    fieldList={fieldList}
+                    data={record.status.memory}
+                  />
+                }
+              />
+            ) : (
+              <HolderStatus />
+            )}
+          </span>
+        )
+      },
+      {
+        title: 'GPU',
+        dataIndex: 'gpu',
+        render: (_, record) =>
+          statusAvailable(record) ? (
+            <GPUCell devices={record?.status?.gpu_devices} />
+          ) : (
+            <HolderStatus />
+          )
+      },
+      {
+        title: intl.formatMessage({ id: 'resources.table.vram' }),
+        dataIndex: 'vram',
+        render: (_, record, rIndex) =>
+          statusAvailable(record) ? (
+            <VRAMCell
+              devices={record?.status?.gpu_devices}
+              intl={intl}
+              rIndex={rIndex}
+              loadend={loadend}
+              firstLoad={firstLoad}
+            />
+          ) : (
+            <HolderStatus />
+          )
+      },
+      {
+        title: intl.formatMessage({ id: 'resources.table.disk' }),
+        dataIndex: 'storage',
+        render: (_, record) => (
+          <span className="flex-center flex-full">
+            {statusAvailable(record) ? (
+              <StorageCell files={record.status?.filesystem} />
+            ) : (
+              <HolderStatus />
+            )}
+          </span>
+        )
+      },
+      {
+        title: intl.formatMessage({ id: 'common.table.operation' }),
+        key: 'operation',
+        render: (_, record) => (
+          <DropdownButtons
+            items={setActions(record)}
+            onSelect={(val) => handleSelect(val, record)}
+          />
+        )
+      }
+    ],
+    [intl, sortOrder, clusterData, loadend, firstLoad, handleSelect]
+  );
+};
+
+export default useWorkerColumns;

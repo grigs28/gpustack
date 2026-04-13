@@ -17,9 +17,10 @@ build/
 credentials*
 *.secret
 
-# IDE
+# IDE & AI tools
 .vscode/
 .idea/
+.gemini/
 *.swp
 *.swo
 
@@ -37,3 +38,6 @@ Thumbs.db
 
 # Large generated files
 gpustack-ui/dist/
+
+# Original upstream CI (not relevant to fork)
+.github/

@@ -1,0 +1,60 @@
+export default {
+  'backends.title': 'Инференс Бэкенды вывода',
+  'backend.button.add': 'Добавить бэкенд',
+  'backend.button.edit': 'Редактировать бэкенд',
+  'backend.versions': 'Список версий',
+  'backend.defaultVersion': 'Версия по умолчанию',
+  'backend.version': 'Версия',
+  'backend.imageName': 'Имя образа',
+  'backend.runCommand': 'Команда выполнения',
+  'backend.framework': 'Фреймворк',
+  'backend.builtin': 'Встроенный',
+  'backend.custom': 'Пользовательский',
+  'backend.community': 'Сообщество',
+  'backend.isDefault': 'По умолчанию',
+  'backend.availableFrameworks': 'Поддерживаемые фреймворки',
+  'backend.addVersion': 'Добавить версию',
+  'backend.filter.framework': 'Фильтр по фреймворку',
+  'backend.export.yaml': 'Экспорт YAML',
+  'backend.mode.form': 'Режим формы',
+  'backend.mode.yaml': 'Режим YAML',
+  'backend.form.healthCheckPath': 'Путь проверки здоровья',
+  'backend.form.defaultExecuteCommand': 'Команда выполнения по умолчанию',
+  'backend.form.defaultExecuteCommand.tips': `'{{'model_path'}}', '{{'port'}}', '{{'worker_ip'}}' и '{{'model_name'}}' заполняются реальными значениями во время запуска`,
+  'backend.form.defaultBackendParameters': 'Параметры бэкенда по умолчанию',
+  'backend.form.versionConfig': 'Конфигурация версий',
+  'backend.form.addParameter': 'Добавить параметр',
+  'backend.form.noVersion': 'Версии не добавлены',
+  'backend.noVersion': 'Версии не найдены',
+  'backend.versionInfo.autoImage': 'Автоматически выбор во время запуска',
+  'backend.version.rules.builtin': 'Должен заканчиваться на "-custom"',
+  'backend.version.no.tips':
+    'Пользовательское название версии встроенного бэкенда должно оканчиваться на «-custom».',
+  'backend.backend.rules.custom':
+    'Пользовательское название бэкенда должно оканчиваться на «-custom».',
+  'backend.quickConfig': 'Быстрая настройка',
+  'backend.version.default.not.exists':
+    'Версия по умолчанию отсутствует в {versions}.',
+  'backend.replaceEntrypoint': 'Переопределить точку входа образа',
+  'backend.entrypoint': 'Точка входа образа',
+  'backend.entrypoint.tips':
+    'Если указано, ENTRYPOINT, заданный в образе, будет проигнорирован, а вместо него для запуска контейнера будет использована команда ниже.',
+  'backend.form.defaultEnvironment': 'Default Environment Variables',
+  'backend.recommendModels': 'Recommended Models',
+  'backend.filter.source': 'Filter by source',
+  'backend.add.custom': 'Custom',
+  'backend.add.community': 'Community',
+  'backend.community.title': 'Community Backend Marketplace',
+  'backend.form.add.hint':
+    'To use a different version of a built-in backend (e.g., vLLM, SGLang, MindIE), please add a new version to the existing backend instead of adding a custom backend.'
+};
+
+// ========== To-Do: Translate Keys (Remove After Translation) ==========
+// 1. 'backend.form.defaultEnvironment': 'Default Environment Variables',
+// 2. 'backend.recommendModels': 'Recommended Models',
+// 3. 'backend.filter.source': 'Filter by source',
+// 4.  'backend.add.custom': 'Custom',
+// 5.  'backend.add.community': 'Community',
+// 6. 'backend.community.title': 'Community Backend Marketplace'
+// 7. 'backend.form.add.hint': 'To use a different version of a built-in backend (e.g., vLLM, SGLang, MindIE), please add a new version to the existing backend instead of adding a custom backend.'
+// ========== End of To-Do List ==========
