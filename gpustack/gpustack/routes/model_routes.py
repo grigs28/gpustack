@@ -543,22 +543,28 @@ async def get_model_route_targets(
     provider_ids = {
         t.provider_id for t in result.items if t.provider_id is not None
     }
+    provider_formats = {}
     if provider_ids:
         from gpustack.schemas.model_provider import ModelProvider
-        providers = {}
         for pid in provider_ids:
             p = await ModelProvider.one_by_id(session=session, id=pid)
-            if p:
-                providers[pid] = p
-        for t in result.items:
-            if t.provider_id and t.provider_id in providers:
-                provider = providers[t.provider_id]
-                config = provider.config
-                if config and hasattr(config, 'supported_formats') and config.supported_formats:
-                    t.supported_formats = config.supported_formats
+            if p and p.config:
+                config = p.config
+                if hasattr(config, 'supported_formats') and config.supported_formats:
+                    provider_formats[pid] = config.supported_formats
                 else:
                     from gpustack.converter.router import FormatRouter
-                    t.supported_formats = FormatRouter.get_provider_supported_formats(config)
+                    provider_formats[pid] = FormatRouter.get_provider_supported_formats(config)
+
+    # Inject supported_formats into serialized items
+    if provider_formats:
+        from gpustack.schemas.model_routes import ModelRouteTargetPublic
+        for i, t in enumerate(result.items):
+            pid = t.provider_id
+            if pid and pid in provider_formats:
+                item_dict = t.model_dump()
+                item_dict['supported_formats'] = provider_formats[pid]
+                result.items[i] = ModelRouteTargetPublic.model_validate(item_dict)
 
     return result
 
