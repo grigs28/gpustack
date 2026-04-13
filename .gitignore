@@ -30,6 +30,8 @@ Thumbs.db
 
 # Claude
 .claude/
+CLAUDE.md
+PRD.md
 
 # Data & logs
 /tmp/
