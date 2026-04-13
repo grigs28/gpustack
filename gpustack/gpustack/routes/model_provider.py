@@ -421,6 +421,9 @@ async def try_model_with_provider(
         raise InvalidException(
             message=f"provider type {input.config.type} does not support testing model accessibility"
         )
+    # Use build_openai_url to handle versioned paths like /v4, /v2 etc.
+    from gpustack.converter.urls import build_openai_url
+    url = build_openai_url(endpoint, completion_url)
     max_output_token_dict = {"max_tokens": 16}
     data = {
         "model": input.model_name,
@@ -430,18 +433,21 @@ async def try_model_with_provider(
     if input.config.type == ModelProviderTypeEnum.QWEN:
         data["enable_thinking"] = False
     async with httpx.AsyncClient(
-        base_url=f"{endpoint}",
         proxy=input.proxy_url,
         trust_env=True,
     ) as client:
         headers = {}
         if input.config.type == ModelProviderTypeEnum.CLAUDE:
             headers["X-API-Key"] = input.api_token
+        elif input.config.type == ModelProviderTypeEnum.CUSTOM:
+            from gpustack.converter.auth import AuthAdapter
+            style = getattr(input.config, 'auth_style', 'bearer') or 'bearer'
+            headers = AuthAdapter.build_headers(input.api_token, "openai", style)
         else:
             headers["Authorization"] = f"Bearer {input.api_token}"
         try:
             response = await client.post(
-                url=completion_url, json=data, headers=headers, timeout=60
+                url=url, json=data, headers=headers, timeout=60
             )
             response.raise_for_status()
             return TestProviderModelResult(

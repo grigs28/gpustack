@@ -29,8 +29,8 @@ Modified files:
              to CustomProviderConfig; dual base URL support via get_base_url(fmt)
 
   - gpustack/routes/model_provider.py
-      Added: build_openai_url() for versioned API path handling
-             Custom auth_style support via AuthAdapter
+      Added: build_openai_url() for versioned API path handling (get-models + test-model)
+             Custom auth_style support via AuthAdapter (get-models + test-model)
              _parse_model_list() for robust multi-format response parsing
 
   - gpustack/routes/openai.py
