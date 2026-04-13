@@ -162,7 +162,10 @@ class ModelRouteTarget(ModelRouteTargetBase, BaseModelMixin, table=True):
 
 
 class ModelRouteTargetPublic(ModelRouteTargetBase, PublicFields):
-    pass
+    supported_formats: Optional[List[str]] = Field(
+        default=None,
+        description="Supported API formats from the provider config",
+    )
 
 
 ModelRouteTargetsPublic = PaginatedList[ModelRouteTargetPublic]
