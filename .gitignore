@@ -43,3 +43,4 @@ gpustack-ui/dist/
 
 # Original upstream CI (not relevant to fork)
 .github/
+docs/superpowers/
