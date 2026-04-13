@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Environment & secrets
+.env
+.env.*
+*.key
+*.pem
+credentials*
+*.secret
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/
+
+# Data & logs
+/tmp/
+*.log
+*.db
+
+# Large generated files
+gpustack-ui/dist/
