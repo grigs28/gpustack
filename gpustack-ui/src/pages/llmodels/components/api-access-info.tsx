@@ -15,27 +15,6 @@ import { modelCategoriesMap } from '../config';
 import { ListItem } from '../config/types';
 import useGenericProxy from '../hooks/use-generic-proxy';
 
-const API_MAP: Record<string, { api: string }> = {
-  [modelCategoriesMap.embedding]: {
-    api: EMBEDDING_API
-  },
-  [modelCategoriesMap.llm]: {
-    api: CHAT_API
-  },
-  [modelCategoriesMap.image]: {
-    api: CREAT_IMAGE_API
-  },
-  [modelCategoriesMap.text_to_speech]: {
-    api: AUDIO_TEXT_TO_SPEECH_API
-  },
-  [modelCategoriesMap.speech_to_text]: {
-    api: AUDIO_SPEECH_TO_TEXT_API
-  },
-  [modelCategoriesMap.reranker]: {
-    api: RERANKER_API
-  }
-};
-
 const ApiAccessInfoWrapper = styled.div`
   display: grid;
   padding-left: 20px;
