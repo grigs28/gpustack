@@ -2,22 +2,15 @@ import AutoTooltip from '@/components/auto-tooltip';
 import CopyButton from '@/components/copy-button';
 import IconFont from '@/components/icon-font';
 import ScrollerModal from '@/components/scroller-modal';
-import { OPENAI_COMPATIBLE } from '@/config/settings';
 import {
-  AUDIO_SPEECH_TO_TEXT_API,
-  AUDIO_TEXT_TO_SPEECH_API,
-  CHAT_API,
-  CREAT_IMAGE_API,
-  EMBEDDING_API,
   MODEL_PROXY,
-  RERANKER_API
 } from '@/pages/playground/apis';
 import { BulbOutlined } from '@ant-design/icons';
 import { useIntl, useNavigate } from '@umijs/max';
 import { Button, Tag } from 'antd';
-import _ from 'lodash';
 import React, { useEffect, useMemo } from 'react';
 import styled from 'styled-components';
+import FormatBadge from '@/pages/model-routes/components/format-badge';
 import { modelCategoriesMap } from '../config';
 import { ListItem } from '../config/types';
 import useGenericProxy from '../hooks/use-generic-proxy';
@@ -98,40 +91,15 @@ const ApiAccessInfo = ({ open, data, onClose }: ApiAccessInfoProps) => {
   const navigate = useNavigate();
   const { GenericProxyCommandCode, openProxyModal } = useGenericProxy();
 
-  const endpoints = useMemo(() => {
+  const baseUrl = useMemo(() => {
     if (data.generic_proxy) {
-      return [
-        {
-          url: `${window.location.origin}${MODEL_PROXY}/<YOUR_API_PATH>`,
-          label: 'Generic Proxy'
-        }
-      ];
+      return `${window.location.origin}${MODEL_PROXY}/<YOUR_API_PATH>`;
     }
-
-    const formats = data.supported_formats || ['openai'];
-    const result = [];
-
-    if (formats.includes('openai')) {
-      result.push({
-        url: `${window.location.origin}/${OPENAI_COMPATIBLE}`,
-        label: intl.formatMessage({ id: 'models.table.apiAccessInfo.openaiCompatible' })
-      });
-    }
-    if (formats.includes('anthropic')) {
-      result.push({
-        url: `${window.location.origin}/v1/messages`,
-        label: 'Anthropic Compatible'
-      });
-    }
-
-    return result.length > 0 ? result : [{
-      url: `${window.location.origin}/${OPENAI_COMPATIBLE}`,
-      label: intl.formatMessage({ id: 'models.table.apiAccessInfo.openaiCompatible' })
-    }];
+    return `${window.location.origin}`;
   }, [data]);
 
   const isRanker = useMemo(() => {
-    return _.includes(data.categories, modelCategoriesMap.reranker);
+    return data.categories?.includes(modelCategoriesMap.reranker);
   }, [data]);
 
   const handleClose = () => {
@@ -181,23 +149,25 @@ const ApiAccessInfo = ({ open, data, onClose }: ApiAccessInfoProps) => {
       </Tips>
 
       <ApiAccessInfoWrapper>
-        {endpoints.map((ep, idx) => (
-          <React.Fragment key={idx}>
-            <span className="label">
-              {intl.formatMessage({ id: 'models.table.apiAccessInfo.endpoint' })}
-              {endpoints.length > 1 && ` ${idx + 1}`}
-            </span>
-            <span className="value">
-              <AutoTooltip ghost maxWidth={240}>
-                {ep.url}
-              </AutoTooltip>
-              <APITAG color="geekblue">{ep.label}</APITAG>
-            </span>
-            <span className="copy-btn">
-              <CopyButton text={ep.url} type="link" size="small"></CopyButton>
-            </span>
-          </React.Fragment>
-        ))}
+        <span className="label">
+          {intl.formatMessage({ id: 'models.table.apiAccessInfo.endpoint' })}
+        </span>
+        <span className="value">
+          <AutoTooltip ghost maxWidth={240}>
+            {baseUrl}
+          </AutoTooltip>
+          {!data.generic_proxy && !isRanker && (
+            <FormatBadge supported_formats={data.supported_formats || ['openai']} />
+          )}
+          {!data.generic_proxy && isRanker && (
+            <APITAG color="geekblue">
+              {intl.formatMessage({ id: 'models.table.apiAccessInfo.jinaCompatible' })}
+            </APITAG>
+          )}
+        </span>
+        <span className="copy-btn">
+          <CopyButton text={baseUrl} type="link" size="small"></CopyButton>
+        </span>
         <span className="label">
           {intl.formatMessage({
             id: 'models.table.apiAccessInfo.modelName'
